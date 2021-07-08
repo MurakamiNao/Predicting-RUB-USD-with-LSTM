@@ -16,7 +16,7 @@ eq=eq[eq['BOARDID']=='CETS']
 close=eq['CLOSE']
 ```
 ## 2nd step: data preparation
-File LSTM.py. 
+File [LSTM.py](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/LSTM.py). 
 ### Remove trend
 Data set is non stationary, in particular it has an increasing trend.
 ![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Figure_1.png)
