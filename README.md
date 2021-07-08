@@ -19,7 +19,7 @@ close=eq['CLOSE']
 File LSTM.py. 
 ### Remove trend
 Data set is non stationary, in particular it has an increasing trend.
-![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Historical_prices.png)
+![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Figure_1.png)
 Remove a trend by differencing the data.
 ```
 diff = close.diff().dropna()
@@ -56,12 +56,10 @@ train_size = int(len(df) * 0.7)
 test_size = len(df) - train_size
 train, test = df[0:-test_size], df[-test_size:]
 ```
-### Transform data to the range of activation function
-Data must be within the scale of the activation function. Default activation function for LSTM is hyperbolic tangent, which outputs values between -1 and 1. 
+### Scaling to the range of activation function
+Transform data to the range of LSTM activation function ( by default hyperbolic tangent), using the MinMaxScaler class.
+To avoid contaminating the experiment with knowledge from the test dataset, calculate Min and max values on the train dataset.
 
-To make the experiment fair, the scaling coefficients (min and max) values must be calculated on the training dataset and applied to scale the test dataset and any forecasts. This is to avoid contaminating the experiment with knowledge from the test dataset, which might give the model a small edge.
-
-We can transform the dataset to the range [-1, 1] using the MinMaxScaler class. 
 ```
 scaler = MinMaxScaler(feature_range=(-1, 1))
 scaler = scaler.fit(train)
