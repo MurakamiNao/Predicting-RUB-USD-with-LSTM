@@ -49,18 +49,22 @@ df.fillna(0,inplace=True)
 |2011-07-15 |0.0650  |-0.0025 |
 |2011-07-18 |-0.0025 |0.1350  |
 
-### split data into  train and test subsets
+### Train and test subsets
+Split data into 70% train and 30% test subsets
 ```
 train_size = int(len(df) * 0.7)
 test_size = len(df) - train_size
 train, test = df[0:-test_size], df[-test_size:]
 ```
+### Transform data to the range of activation function
+Data must be within the scale of the activation function. Default activation function for LSTM is hyperbolic tangent, which outputs values between -1 and 1. 
 
+To make the experiment fair, the scaling coefficients (min and max) values must be calculated on the training dataset and applied to scale the test dataset and any forecasts. This is to avoid contaminating the experiment with knowledge from the test dataset, which might give the model a small edge.
 
-# scale train and test data to the range of activation function
+We can transform the dataset to the range [-1, 1] using the MinMaxScaler class. 
+```
 scaler = MinMaxScaler(feature_range=(-1, 1))
 scaler = scaler.fit(train)
 train_scaled = scaler.transform(train)
 test_scaled = scaler.transform(test)
-# print(train_scaled.shape)
-# print(test_scaled.shape)
+```
