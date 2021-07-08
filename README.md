@@ -1,22 +1,22 @@
-# Univariate LSTM model for predicting USD/RUB
-This is univariate LSTM model to predict USD/RUB exchange rate, using (Long Short-Term Memory) LSTM recurrent neural network. Previous day prices are used to predict Observation from the prior time step (t-1) is used to predict the observation at the current time step (t).
+# Univariate LSTM model for one-step USD/RUB forecast
+In this code I built univariate LSTM model for one-step USD/RUB price forecast, i.e. observation from the prior time step (t-1) is used to predict the observation at the current time step (t).
 ## 1st step: Importing data
-File [import_data.py](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/import_data.py). Extract a 10-year daily prices of USD/RUB from Moscow Exchange, using pandas_datareader.DataReader. Select  systemic trade mode (CETS) and only close prices. Write data to csv.
+File [import_data.py](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/import_data.py). Import 10-year daily prices of USD/RUB from Moscow Exchange (MOEX), using DataReader. This returns DataFrame with multiple columns: open, close, low, high price etc. Select close price. Also MOEX has several trade modes (BOARDID field).  Select  systemic trade mode (CETS). 
 ```
 import pandas_datareader as web
+
+ticker='USD000UTSTOM'
+end=dt.datetime.today()
+start=dt.date(end.year-10,end.month,end.day)
 
 eq=web.DataReader(ticker,'moex',start,end)
 # CETS trade mode
 eq=eq[eq['BOARDID']=='CETS']
-# close prices
+# close rices
 close=eq['CLOSE']
-close.to_csv('Data\RUB_close.csv')
 ```
 ## 2nd step: data preparation
-File LSTM.py. Read data from csv.
-```
-close = read_csv('Data\RUB_close.csv',index_col=0,header=0)
-```
+File LSTM.py. 
 ### Remove trend
 Data set is non stationary, in particular it has an increasing trend.
 ![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Historical_prices.png)
