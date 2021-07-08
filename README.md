@@ -16,3 +16,4 @@ close.to_csv('Data\RUB_close.csv')
 ```
 ## 2nd step: data preparation
 Data set is non stationary, in particular it has increasing trend.
+![Alt-текст]()
