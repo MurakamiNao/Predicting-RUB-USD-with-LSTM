@@ -104,12 +104,40 @@ adam = optimizers.Adam(lr=0.001)
 model.compile(loss='mean_squared_error', optimizer=adam)
 ```
 ## 4th step: Train model
-Train the model for 1000 epochs or iterations. Reset the internal state at the end of the training epoch.
+Train the model for 1000 epochs. Reset the internal state at the end of the training epoch.
 Set shuffle=False to disable shuffling  samples prior to being exposed to the network.
 
 ```
-# manually fit the network to the training data: reset the internal state at the end of the training epoch
+# manually fit the network to the training data
 for i in range(n_epochs):
     model.fit(train_x, train_y, epochs=1, batch_size=n_batch, verbose=0, shuffle=False)
     model.reset_states()
+```
+## 5th step:Forecast
+Forecast both train and test dataset. Build up state for forecasting by making a prediction on all samples in the training dataset.
+Invert predicted values to the scale of original data using inverse_transform method. Invert differenced vales back to prices.
+
+```
+outputTrain=model.predict(train_x, batch_size=n_batch)
+outputTest = model.predict(test_x, batch_size=n_batch)
+
+def walk_forward_validation(output,scaled,raw_data,scaler):
+    predictions = list()
+    for i in range(len(output)):
+        yhat = output[i, :]
+        X=scaled[i, 0]
+        new_row = [X] + [yhat]
+        array = np.array(new_row)
+        array = array.reshape(1, len(array))
+        inverted = scaler.inverse_transform(array)
+        yhat=inverted[0, -1]
+        yhat=yhat + raw_data[-(len(scaled)+1)+i]
+        # print(raw_data[-len(scaled)+i])
+        # print(yhat)
+        predictions.append(yhat)
+    return predictions
+
+Train_Predicted=walk_forward_validation(outputTrain,train_scaled,raw_data[:train_size+1],scaler)
+Test_Predicted=walk_forward_validation(outputTest,test_scaled,raw_data,scaler)
+
 ```
