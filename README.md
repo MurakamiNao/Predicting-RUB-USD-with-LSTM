@@ -2,6 +2,7 @@
 In this code I built univariate LSTM model for one-step USD/RUB price forecast, i.e. observation from the prior time step (t-1) is used to predict the observation at the current time step (t).
 ## 1st step: Import data
 File [import_data.py](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/import_data.py). Import a 10-year daily prices of USD/RUB from Moscow Exchange (MOEX), using DataReader. This returns DataFrame with multiple columns: open, close, low, high price etc. Select close price. Also MOEX has several trade modes (BOARDID field).  Select  systemic trade mode (CETS). 
+
 ```
 eq=pandas_datareader.DataReader(ticker,'moex',start,end)
 # CETS trade mode
@@ -73,14 +74,9 @@ test_x= test_x.reshape(test_x.shape[0], 1, 1)
 ```
 ## 3rd step: Build and compile network
 Build  Sequential model, which is a linear stack of layers:  LSTM hidden layer with 5 memory blocks or neurons and densely-connected layer with 1 neuron to output forecast.
-
 Input data specified in LSTM layer must have  3D dimention:  [batch_size, time steps, features], where batch_size is the number of samples shown to Neural Network before updating the weights. The size of  training and test datasets must be divisible by batch_size without a remainder.Set n_batch=1, i.e. update weights every timestep.
+Make LSTM stateful by setting stateful=True to avoid clearing the state between batches.Leave default hyperbolic tangent as an activation function for LSTM layer. For output layer in the case of  regression problem use default linear activation function.
 
-Make LSTM stateful by setting stateful=True to avoid clearing the state between batches.
-
-Leave default hyperbolic tangent as an activation function for LSTM layer. For output layer in the case of  regression problem use default linear activation function.
-
-After building the network compile it. Specify popular Adam optimization algorithm. Use Mean Squared Error loss function for the regression problem.
 ```
 # set hyperparameters
 n_batch=1
@@ -93,14 +89,16 @@ model = Sequential()
 model.add(LSTM(neurons, batch_input_shape=(n_batch, train_x.shape[1], train_x.shape[2]),stateful=True))
 # densely-connected layer - output layer
 model.add(Dense(1))
-
-# compile the network
+```
+After building the network compile it. Specify popular Adam optimization algorithm. Use Mean Squared Error loss function for the regression problem.
+```
 adam = optimizers.Adam(lr=0.001)
 model.compile(loss='mean_squared_error', optimizer=adam)
 ```
 ## 4th step: Train model
 Train the model for 1000 epochs. Reset the internal state at the end of the training epoch.
 Set shuffle=False to disable shuffling  samples prior to being exposed to the network.
+
 ```
 for i in range(n_epochs):
     model.fit(train_x, train_y, epochs=1, batch_size=n_batch, verbose=0, shuffle=False)
