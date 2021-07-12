@@ -155,10 +155,8 @@ invertedTest=invert_diff(invertedTest,raw_data[train_size:])
 ```
 ## 7th step: Evaluate performance
 Finally, calculate an error score to evaluate the skill of the model. Choose root mean squared error (RMSE) because it punishes large errors. 
-I recieved the following results: 
-Train RMSE: 0.595
-Test RMSE: 0.770
-The results is pretty good? test error isn't much bigger than train error
+I recieved 0.595 RUB train RMSE and 0.770 RUB test RMSE. The results are pretty good: test error isn't much bigger than train error.
+![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Figure_1.png)
 ```
 # evaluate the skill of the model
 rmseTrain = sqrt(mean_squared_error(raw_data[1:train_size+1], invertedTrain))
