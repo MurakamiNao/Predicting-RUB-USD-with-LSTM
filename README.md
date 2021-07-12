@@ -177,6 +177,6 @@ plt.plot(invertedTest)
 plt.legend(['actual','predicted'],loc='upper left')
 plt.show()
 ```
-I recieved **0,595 RUB train RMSE** and **0,770 RUB test RMSE**. The results are pretty good: RMSE for test dataset isn't much bigger than RMSE for training set. To improve the result, you can tweak hyperparameters and/or try more complex network.
+I recieved **0,595 RUB train RMSE** and **0,770 RUB test RMSE**. The results are pretty good: RMSE for test dataset isn't much bigger than RMSE for training set. To improve the result, you can tweak hyperparameters and/or try more complex network.  
 ![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Figure_2.png)  
 _Note that results may vary due to stochastic nature of the algorithm. It is better to repeat the experiment several times and calculate average error score. I omitted this step  due to long training poccess._
