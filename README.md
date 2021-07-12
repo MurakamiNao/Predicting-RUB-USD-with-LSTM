@@ -1,8 +1,11 @@
 # Univariate LSTM model for one-step USD/RUB forecast
-This is a univariate LSTM model for one-step USD/RUB price forecast, i.e. observation from the prior time step (t-1) is used to predict the observation at the current time step (t). I used python 3.7 and keras 2.3.1 with TensorFlow backend.
+This is a **univariate LSTM model** for one-step USD/RUB price forecast, i.e. observation from the prior time step (t-1) is used to predict the observation at the current time step (t).  
+  
+_I used python 3.7 and keras 2.3.1 with TensorFlow backend._
 
 ## 1st step: Import data
-File [import_data.py](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/import_data.py). Import a 10-year daily prices of USD/RUB from Moscow Exchange (MOEX), using DataReader. This returns DataFrame with multiple columns: open, close, low, high price etc. Select close price. Also MOEX has several trade modes (BOARDID field).  Select  systemic trade mode (CETS). 
+File [import_data.py](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/import_data.py).  
+Import a 10-year daily prices of USD/RUB from Moscow Exchange (MOEX), using **DataReader**. This returns DataFrame with multiple columns: open, close, low, high price etc. Select **close price**. Also MOEX has several trade modes (BOARDID field).  Select  **systemic trade mode (CETS)**. 
 ```
 # import data from MOEX
 eq=pandas_datareader.DataReader(ticker,'moex',start,end)
@@ -16,7 +19,7 @@ close=eq['CLOSE']
 ## 2nd step: Prepare Data 
 File [LSTM.py](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/LSTM.py). 
 ### 2.1 Remove trend
-Data set is non stationary, in particular it has an increasing trend.
+Data set is **non stationary**, in particular it has an increasing trend.
 ![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Figure_1.png)
 Remove a trend by differencing the data, i.e. subtract  previous day price from current price.
 ```
@@ -32,7 +35,7 @@ diff = close.diff().dropna()
 |2011-07-18 |0.1350  |
 
 ### 2.2 Supervised learning
-Divide data into input x and output y. Use price from the previous day as the input and current price as the output.
+Divide data into input **x** and output **y**. Use price from the previous day as the input and current price as the output.
 ```
 # convert data to supervised learning
 df=diff.assign(x=diff.shift(1))
@@ -58,7 +61,7 @@ test_size = len(df) - train_size
 train, test = df[0:-test_size], df[-test_size:]
 ```
 ### 2.4 Scaling to the range of activation function
-Transform data to the range of LSTM activation function (by default hyperbolic tangent), using the MinMaxScaler class.
+Transform data to the range of LSTM activation function (by default hyperbolic tangent), using the **MinMaxScaler class**.
 Calculate Min and max values on the train dataset to avoid test data influencing model.
 ```
 # scale train and test data to the range of activation function
@@ -155,8 +158,6 @@ invertedTest=invert_diff(invertedTest,raw_data[train_size:])
 ```
 ## 7th step: Evaluate performance
 Finally, calculate an error score to evaluate the skill of the model. Choose root mean squared error (RMSE) because it punishes large errors. 
-I recieved 0.595 RUB train RMSE and 0.770 RUB test RMSE. The results are pretty good: test error isn't much bigger than train error.
-![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Figure_1.png)
 ```
 # evaluate the skill of the model
 rmseTrain = sqrt(mean_squared_error(raw_data[1:train_size+1], invertedTrain))
@@ -168,3 +169,6 @@ plt.plot(invertedTest)
 plt.legend(['actual','predicted'],loc='upper left')
 plt.show()
 ```
+I recieved 0.595 RUB train RMSE and 0.770 RUB test RMSE. The results are pretty good: test error isn't much bigger than train error. To improve the result, you can tweak hyperparameters or try more complex network.
+![Alt-текст](https://github.com/MurakamiNao/Predicting-RUB-USD-with-LSTM/blob/main/Figure_2.png)
+Note that results may vary due to stochastic nature of the algorithm. It is better to repeat the experiment several times and calculate average error score. I omitted this step  due to long training poccess.
